@@ -113,8 +113,14 @@ class AI:
         AI.easy_map.visited_cells.add(my_pos)
 
         if resource.value > 0:  # TODO: age ja dasht bazam bardare
-            self.direction = AI.easy_map.get_shortest_path(
-                my_pos, my_base, only_seen=True)[0]
+            moves = AI.easy_map.get_shortest_path(
+                my_pos, my_base, only_seen=True, have_resource=True)
+            logger.info(f'SALAAAM{len(moves)}')
+            if len(moves) == 0:
+                logger.info("************************")
+                moves = AI.easy_map.get_shortest_path(
+                    my_pos, my_base, only_seen=True)
+            self.direction = moves[0]
             logger.info("base destination")
         else:
             res_pos, move = AI.easy_map.find_best_resource(my_pos)
@@ -161,6 +167,9 @@ class AI:
         logger.info(f"Turn: {AI.turn_num}")
         logger.info(f"my pos: {(me.currentX, me.currentY)}")
         logger.info(f"walls: {AI.easy_map.walls}")
+        logger.info(f"swamps: {AI.easy_map.swamps}")
+        logger.info(f"traps: {AI.easy_map.traps}")
+
         logger.info(f"breads: {AI.easy_map.bread}")
         logger.info(f"garss: {AI.easy_map.grass}")
         logger.info(f"unknown res: {AI.easy_map.unknown_res}")
@@ -172,6 +181,8 @@ class AI:
         logger.info(
             f"SECOND around base cells: {AI.easy_map.second_around_enemy_base}")
         logger.info(f"enemy base: {AI.easy_map.enemy_base}")
+        logger.info(
+            f"Last last pos: {AI.easy_map.last_last_cell}, last pos: {AI.easy_map.last_cell}")
 
     def turn(self) -> (str, int, int):
         AI.easy_map.update(self.game)
@@ -189,11 +200,14 @@ class AI:
             logger.info("***EXCEPTION***")
             logger.exception(e)
 
-        AI.easy_map.last_last_cell = AI.easy_map.last_cell
-        AI.easy_map.last_cell = (me.currentX, me.currentY)
-
-        logger.info(
-            f"decide: { self.direction} - message: {self.message} - value: { self.value}")
-        logger.info("")
-        logger.info("")
+        try:
+            AI.easy_map.last_last_cell = AI.easy_map.last_cell
+            AI.easy_map.last_cell = (me.currentX, me.currentY)
+            logger.info(
+                f"decide: { self.direction} - message: {self.message} - value: { self.value}")
+            logger.info("")
+            logger.info("")
+        except Exception as e:
+            logger.info("***EXCEPTION***2")
+            logger.exception(e)
         return self.message, self.value, self.direction

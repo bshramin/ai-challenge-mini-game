@@ -25,6 +25,8 @@ class EasyMap():
 
         self.local_view = set()
         self.walls = set()
+        self.traps = set()
+        self.swamps = set()
         self.bread = dict()
         self.grass = dict()
 
@@ -109,6 +111,10 @@ class EasyMap():
 
                 if cell.type == CellType.WALL.value:
                     self.walls.add(easy_cell)
+                elif cell.type == CellType.TRAP.value:
+                    self.traps.add(easy_cell)
+                elif cell.type == CellType.SWAMP.value:
+                    self.swamps.add(easy_cell)
                 elif cell.type == CellType.BASE.value and easy_cell != my_base:
                     self.enemy_base = easy_cell
                 elif cell.resource_value > 0:
@@ -157,8 +163,6 @@ class EasyMap():
                 self.zero_around_enemy_base.add(self.last_cell)
 
         self.last_health = self.game.ant.health
-        logger.info(
-            f"Last last pos: {self.last_last_cell}, last pos: {self.last_cell}")
 
     def get_easy_neighbor(self, source_cell, dx, dy):
         cell_x = (x(source_cell) + dx) % self.game.mapWidth
@@ -168,7 +172,13 @@ class EasyMap():
     def is_wall(self, cell):
         return cell in self.walls
 
-    def get_shortest_path(self, source_cell, dest_cell, only_seen=False, dont_die=True):
+    def is_trap(self, cell):
+        return cell in self.traps
+
+    def is_swamp(self, cell):
+        return cell in self.swamps
+
+    def get_shortest_path(self, source_cell, dest_cell, only_seen=False, dont_die=True, have_resource=False):
         queue = [source_cell]
         visited = []
         moves_list = [[]]
@@ -201,22 +211,36 @@ class EasyMap():
                         continue
                     if dont_die and cell in self.first_around_enemy_base:
                         continue
-
+                    if have_resource and self.is_trap(cell):
+                        continue
+                    next_moves = moves + [cdir]
+                    if self.is_swamp(cell):
+                        next_moves.extend([Direction.CENTER.value, Direction.CENTER.value, Direction.CENTER.value])
                     visited.append(cell)
-                    queue.append(cell)
-                    moves_list.append(moves + [cdir])
+                    index = len(moves_list)
+                    for move in moves_list:
+                        if len(next_moves) < len(move):
+                            index = moves_list.index(move)
+                            break
+                    queue.insert(index, cell)
+                    moves_list.insert(index, next_moves)
 
     def find_best_resource(self, source_cell):
         # TODO: maybe check outside of local too
         min_dist = map_size
         best_cell = None
         best_move = None
+        my_base = (self.game.baseX, self.game.baseY)
         # TODO: decide res_type
         for res_cell, res_val in {**self.bread, **self.grass}.items():
             # TODO: check res_value too
             moves = self.get_shortest_path(source_cell, res_cell)
+            back_moves = self.get_shortest_path(res_cell, my_base, have_resource=True)
             dist = len(moves)
-            if dist > 0 and dist < min_dist:
+            if dist > 0 and dist < min_dist and len(back_moves) > 0:
+                logger.info("&&&&")
+                logger.info(back_moves)
+                logger.info("&&&&")
                 min_dist = dist
                 best_cell = res_cell
                 best_move = moves[0]
@@ -224,8 +248,9 @@ class EasyMap():
         if best_cell is None:
             for res_cell in self.unknown_res:
                 moves = self.get_shortest_path(source_cell, res_cell)
+                back_moves = self.get_shortest_path(res_cell, my_base, have_resource=True)
                 dist = len(moves)
-                if dist > 0 and dist < min_dist:
+                if dist > 0 and dist < min_dist and len(back_moves) > 0:
                     min_dist = dist
                     best_cell = res_cell
                     best_move = moves[0]
@@ -233,20 +258,25 @@ class EasyMap():
 
     def random_walk(self, source_cell):
         best_cell = None
+        best_moves = 99999
         best_move = None
         min_dist = 0
         while True:
             unvisited_min_dist = self.get_all_unvisited_cells_with_dist(
                 min_dist)
+            unvisited_min_dist += self.get_all_unvisited_cells_with_dist(
+                min_dist + 1)
             if unvisited_min_dist:
-                while best_move is None:
+                while unvisited_min_dist:
                     random_cell = random.choice(unvisited_min_dist)
+                    unvisited_min_dist.remove(random_cell)
                     moves = self.get_shortest_path(source_cell, random_cell)
-                    if len(moves) > 0:
-                        best_cell = random_cell
+                    if 0 < len(moves) < best_moves:
+                        best_moves = len(moves)
                         best_move = moves[0]
+                        best_cell = random_cell
                 if best_move:
-                    return random_cell, best_move
+                    return best_cell, best_move
             min_dist += 1
 
     def get_all_unvisited_cells_with_dist(self, dist):
@@ -255,7 +285,7 @@ class EasyMap():
         for x in range(-1 * dist, dist + 1):
             y = dist - abs(x)
             pos = self.get_easy_neighbor(my_pos, x, y)
-            if pos not in self.visited_cells and not self.is_wall(pos):
+            if pos not in self.seen_cells and not self.is_wall(pos):
                 unvisited_cells.append(pos)
         return unvisited_cells
 
