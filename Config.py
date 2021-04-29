@@ -1,24 +1,31 @@
-ants_view = 4  # میزان دید منهتنی نیروها
-ants_reg_rate = 0.8  # مقدار منبع به جا مانده بعد از مرگ نیرو
-base_range = 6  # میزان دید منهتنی پایگاه
-base_damage = 3  # میزان آسیب حمله پایگاه
-base_health = 20  # میزان سلامتی اولیه پایگاه
-max_com_per_turn = 5  # حداکثر تعداد پیام در هر دور
-max_com_length = 32  # (Byte)حداکثر طول پیام‌ها
-max_turn = 100  # حداکثر تعداد دور بازی
-worker_health = 6  # میزان سلامتی اولیه مورچه (کارگر)
-attacker_health = 8  # میزان سلامت اولیه عقرب (سرباز)
-attacker_range = 4  # برد حمله عقرب
-attacker_damage = 2  # میزان آسیب حمله عقرب
-worker_price = 10  # هزینه تولید مورچه
-ant_max_rec_amount = 10  # میزان باری که مورچه می‌تواند حمل کند
-attacker_price = 15  # هزینه تولید عقرب
-start_worker = 4  # تعداد مورچه‌ها در شروع
-start_attacker = 0  # تعداد عقرب‌ها در شروع
-max_turn_time = 0.1  # زمان هر نوبت
-map_size = 35  # حداکثر طول هر ضلع نقشه
-map_wall_perc = 20  # % درصدی از مپ که دیوارها هستند
-min_base_dist = 10  # حداقل فاصله‌ی دو پایگاه
-work_rec_amount = 800  # مقدار گندم موجود در نقشه
-attack_rec_amount = 800  # مقدار علف موجود در نقشه
-mirror_effect = True  # اتصال بالا و پایین و چپ راست زمین
+# Map Details
+CHAT_LIMIT = 5
+MAX_MESSAGE_LENGTH = 32
+QUEEN_ANT_INITIAL_HEALTH = 20
+SOLDIER_ANT_INITIAL_HEALTH = 6
+COLONY_INITIAL_BREAD = 0
+COLONY_INITIAL_GRASS = 0
+GENERATE_WORKER_BREAD_AMOUNT = 1
+GENERATE_SOLDIER_GRASS_AMOUNT = 1
+ANT_MAX_VIEW_DISTANCE = 4
+ANT_MAX_ATTACK_DISTANCE = 4
+ANT_ATTACK_DAMAGE = 2
+GAME_MAXIMUM_TURN_COUNT = 150
+
+RATE_DEATH_RESOURCE = 0
+BASE_MAX_ATTACK_DISTANCE = 0
+BASE_ATTACK_DAMAGE = 0
+BASE_INIT_HEALTH = 10
+WORKER_MAX_CARRYING_RESOURCE_AMOUNT = 0
+# Number of agents for EACH TEAM
+# SCORPION = Soldier, ANT = Worker :)
+INIT_SCORPIONS = 1
+
+MOVE_NOISE = 0.05
+# generate scorpion every felan cycles
+SOLDIER_GENERATION_CYCLE_LENGTH = 2
+# generate felan scorpions in cycles
+SOLDIER_GENERATION_RATE = 1
+
+# server runtime configs
+READ_MAP_FROM_FILE = True

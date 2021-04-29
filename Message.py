@@ -1,18 +1,17 @@
 import logging
 
-from Config import *
+from Config import MAX_MESSAGE_LENGTH
 
 logger = logging.getLogger(__name__)
 
 
 class MessageType:  # also major_priority
-    RESOURCE = "0"
-    MY_POS_on_RES = "1"
-    INVALIDATE_RESOURCE = "2"
-    ZERO_ATTACK_BY_ENEMY_BASE = "3"
-    FIRST_ATTACK_BY_ENEMY_BASE = "4"
-    SECOND_ATTACK_BY_ENEMY_BASE = "5"
-    ENEMY_BASE_FOUND = "6"
+    OUR_QUEEN_MOVING_TO = "1"
+    SEEN_SWAMPS = "2"
+    SCORPION_IN_POSITION = "3"
+    SCORPION_GOT_ATTACKED = "4"
+    SCORPION_DIED_IN_POSITION = "5"
+    ENEMY_QUEEN_FOUND = "6"
 
 
 class EasyMessage:
@@ -22,13 +21,12 @@ class EasyMessage:
     '''
 
     major_priority_map = {
-        MessageType.RESOURCE: 200,
-        MessageType.MY_POS_on_RES: 100,
-        MessageType.INVALIDATE_RESOURCE: 200,
-        MessageType.ENEMY_BASE_FOUND: 10000,
-        MessageType.ZERO_ATTACK_BY_ENEMY_BASE: 5000,
-        MessageType.FIRST_ATTACK_BY_ENEMY_BASE: 5000,
-        MessageType.SECOND_ATTACK_BY_ENEMY_BASE: 5000,
+        MessageType.OUR_QUEEN_MOVING_TO: 500,
+        MessageType.SEEN_SWAMPS: 10,
+        MessageType.SCORPION_IN_POSITION: 200,
+        MessageType.SCORPION_GOT_ATTACKED: 100,
+        MessageType.SCORPION_DIED_IN_POSITION: 200,
+        MessageType.ENEMY_QUEEN_FOUND: 1000,
     }
 
     @staticmethod
@@ -43,7 +41,7 @@ class EasyMessage:
         message_pack_str = sorted_pack[0][0]
         message_sum_val = sorted_pack[0][1]
         for message in sorted_pack[1:]:
-            if len(message_pack_str + message[0]) < max_com_length:
+            if len(message_pack_str + message[0]) < MAX_MESSAGE_LENGTH:
                 message_pack_str += "|" + message[0]
                 message_sum_val += message[1]
 

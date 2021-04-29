@@ -1,9 +1,8 @@
 import logging
-
-from Config import *
-from Message import *
-from Model import *
 import random
+
+from Message import EasyMessage, MessageType
+from Model import Game, AntType, CellType, ResourceType, Direction
 
 logger = logging.getLogger(__name__)
 

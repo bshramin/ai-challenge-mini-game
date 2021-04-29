@@ -5,7 +5,7 @@ Controller.spec
 __pycache__/
 .idea
 .vscode
-
+venv
 # Created by https://www.toptal.com/developers/gitignore/api/vscode,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=vscode,pycharm
 

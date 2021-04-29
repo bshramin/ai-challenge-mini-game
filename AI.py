@@ -3,10 +3,9 @@ import os
 import random
 import time
 
-from Config import *
-from Easy_map import *
-from Message import *
-from Model import *
+from Easy_map import EasyMap
+from Message import MessageType, EasyMessage
+from Model import Game, AntType, AntTeam
 
 if not os.path.exists('ezlog'):
     os.makedirs('ezlog')
