@@ -374,8 +374,6 @@ class CellType(Enum):
     BASE = 0
     EMPTY = 1
     WALL = 2
-    TRAP = 3
-    SWAMP = 4
 
     @staticmethod
     def get_value(string: str):

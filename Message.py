@@ -52,8 +52,9 @@ class EasyMessage:
     def unpack_message(messages_str):
         message_objects = dict()
         for message_str in messages_str.split('|'):
-            mtype, mpos_x, mpos_y = message_str.split(',')
-            if mtype not in message_objects:
-                message_objects[mtype] = []
-            message_objects[mtype].append((int(mpos_x), int(mpos_y)))
+            if len(message_str.split(',')) == 3:
+                mtype, mpos_x, mpos_y = message_str.split(',')
+                if mtype not in message_objects:
+                    message_objects[mtype] = []
+                message_objects[mtype].append((int(mpos_x), int(mpos_y)))
         return message_objects
