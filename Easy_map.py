@@ -1,11 +1,13 @@
 import logging
 import random
-
+import time
 from Message import EasyMessage, MessageType
-from Model import Game, AntType, CellType, ResourceType, Direction
+from Model import Game, AntType, CellType, Direction
 
 logger = logging.getLogger(__name__)
 
+time_seed = int(time.time())
+random.seed(time_seed)
 
 def x(ez_cell):
     return ez_cell[0]
@@ -18,7 +20,7 @@ def y(ez_cell):
 class EasyMap:
     duty_poses = [
         (1, 1), (-1, -1), (1, -1), (-1, 1),
-        (-2, 0), (2, 0), (0, 2), (0, -2)
+        (-1, 0), (1, 0), (0, 1), (0, -1)
     ]
 
     def __init__(self):
@@ -88,10 +90,10 @@ class EasyMap:
 
                 for ant in cell.ants:
                     if ant.antTeam != self.game.ant.antTeam:
-                        if ant.antType == AntType.QUEEN:
+                        if ant.antType == AntType.QUEEN.value:
                             if not self.last_enemy_queen_pos_in_messages or (cell.x != self.last_enemy_queen_pos_in_messages[0] or cell.y != self.last_enemy_queen_pos_in_messages[1]):
                                 self.new_enemy_queen_pos = easy_cell
-                        if ant.antType == AntType.SCORPION:
+                        if ant.antType == AntType.SCORPION.value:
                             self.enemy_scorpion_in_local_view.add(easy_cell)
 
     def is_wall(self, cell):
@@ -182,10 +184,14 @@ class EasyMap:
             if pos not in self.filled_duty_poses:
                 available_duty_cells.append(pos)
 
-        return available_duty_cells[0]
+        index = int(random.random() * len(available_duty_cells))
+        return available_duty_cells[index]
 
     def get_queen_next_pos(self, source_cell):
         if not self.enemy_scorpion_in_local_view:
+            stay = random.random() < 0.7
+            if stay:
+                return source_cell, Direction.CENTER.value
             cell, move = self.random_walk(source_cell)
             self.our_queens_next_pos = cell
             return self.random_walk(source_cell)
@@ -213,18 +219,18 @@ class EasyMap:
         if not self.duty_pos:
             self.duty_pos = self.find_scorpion_duty_pos()
 
-        # if not self.our_queen_pos:
-        return source_cell, Direction.CENTER.value
+        if not self.our_queen_pos:
+            return source_cell, Direction.CENTER.value
 
-        # to_be_in_cell = (
-        #     self.duty_pos[0] + self.our_queen_pos[0],
-        #     self.duty_pos[1] + self.our_queen_pos[1],
-        # )
+        to_be_in_cell = (
+            self.duty_pos[0] + self.our_queen_pos[0],
+            self.duty_pos[1] + self.our_queen_pos[1],
+        )
 
-        # if to_be_in_cell in self.walls:
-        # return (self.our_queen_pos[0], self.our_queen_pos[1]), self.get_shortest_path(source_cell, (self.our_queen_pos[0], self.our_queen_pos[1]))
+        if to_be_in_cell in self.walls:
+            return (self.our_queen_pos[0], self.our_queen_pos[1]), self.get_shortest_path(source_cell, (self.our_queen_pos[0], self.our_queen_pos[1]))[0]
 
-        # return to_be_in_cell, self.get_shortest_path(source_cell, to_be_in_cell)
+        return to_be_in_cell, self.get_shortest_path(source_cell, to_be_in_cell)[0]
 
     def attack_enemy_queen(self, source_cell):
         return self.last_enemy_queen_pos_in_messages, self.get_shortest_path(source_cell, self.last_enemy_queen_pos_in_messages)[0]
